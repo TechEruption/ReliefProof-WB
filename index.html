@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReliefProof WB - Blockchain-Based Disaster Relief Transparency System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-content">
+        <div class="header">
+            <div class="header-content">
+                <div class="logo-section" onclick="goToHome()">
+                    <div class="logo">RP</div>
+                    <div class="title-section">
+                        <h1>ReliefProof WB</h1>
+                        <p>Blockchain-Based Disaster Relief Transparency System</p>
+                    </div>
+                </div>
+                <div class="nav-buttons" id="navButtons"></div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Home Section -->
+            <div id="home" class="section active">
+                <div class="hero-section">
+                    <h2>Transparent. Tamper-Proof. Trustworthy.</h2>
+                    <p>Empowering disaster relief governance through blockchain technology and citizen-verifiable proof systems</p>
+                </div>
+
+                <div class="portal-choice">
+                    <div class="portal-card" onclick="goToOfficerPortal()">
+                        <div class="portal-icon">&#128100;</div>
+                        <h3>Officer Portal</h3>
+                        <p>Government officials record and distribute relief</p>
+                    </div>
+                    <div class="portal-card" onclick="goToBeneficiaryPortal()">
+                        <div class="portal-icon">&#128101;</div>
+                        <h3>Beneficiary Portal</h3>
+                        <p>Citizens claim and verify their relief records</p>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">&#128279;</div>
+                        <h3>Blockchain Security</h3>
+                        <p>Immutable records using SHA-256 cryptographic hashing for tamper-proof relief distribution data</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">&#10003;</div>
+                        <h3>Citizen Verification</h3>
+                        <p>Beneficiaries can verify their relief records anytime using QR codes or Relief IDs</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">&#128274;</div>
+                        <h3>Privacy Protected</h3>
+                        <p>Personal data stays off-chain. Only anonymized, aggregated statistics are publicly visible</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">&#128202;</div>
+                        <h3>Real-Time Dashboard</h3>
+                        <p>Live transparency with district-wise statistics and integrity verification</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 3rem;">
+                    <div class="card-header">
+                        <div class="card-icon">&#9432;</div>
+                        <h2>How It Works</h2>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <h3 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Step 1: Relief Distribution</h3>
+                            <p>Government officer distributes relief to beneficiaries during disaster recovery</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Step 2: Record Entry</h3>
+                            <p>Officer enters minimal details into ReliefProof WB portal</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Step 3: Blockchain Hash</h3>
+                            <p>System generates cryptographic hash and links to previous record, creating immutable chain</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Step 4: Beneficiary Verification</h3>
+                            <p>Beneficiary verifies identity via Aadhaar and claims relief with proof</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Step 5: Verification</h3>
+                            <p>Anyone can verify relief records. Public dashboard shows aggregated data</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Officer Portal Sections -->
+            <!-- Officer Record Relief Section -->
+            <div id="officer-record" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">&#128100;</div>
+                        <h2>Record Relief Distribution</h2>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> Enter relief distribution details below. Enter PIN code to auto-fill location details.
+                    </div>
+                    <form id="reliefForm" onsubmit="submitRelief(event)">
+                        <div class="form-group">
+                            <label>PIN Code</label>
+                            <input type="text" id="pinCode" placeholder="Enter 6-digit PIN code" pattern="[0-9]{6}" maxlength="6" required>
+                            <small style="color: var(--gray); display: block; margin-top: 0.5rem;">Location details will auto-fill based on PIN code</small>
+                        </div>
+                        <div id="pinCodeStatus"></div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>District</label>
+                                <input type="text" id="district" placeholder="Auto-filled from PIN" disabled required>
+                            </div>
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" id="state" placeholder="Auto-filled from PIN" disabled>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Post Office</label>
+                                <input type="text" id="postOffice" placeholder="Auto-filled from PIN" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Block/Area</label>
+                                <input type="text" id="blockCode" placeholder="Auto-filled from PIN" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Relief Type</label>
+                            <select id="reliefType" required>
+                                <option value="">Select Relief Type</option>
+                                <option value="CASH">Cash Assistance</option>
+                                <option value="FOOD">Food Ration</option>
+                                <option value="MEDICAL">Medical Supplies</option>
+                                <option value="SHELTER">Shelter Material</option>
+                                <option value="CLOTHING">Clothing</option>
+                                <option value="OTHER">Other Relief</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Quantity/Amount</label>
+                            <input type="text" id="quantity" placeholder="e.g., 5000 INR or 10 kg">
+                        </div>
+                        <div class="form-group">
+                            <label>Additional Notes (Optional)</label>
+                            <textarea id="notes" rows="3" placeholder="Any additional information for internal record"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="submitReliefBtn">Submit Relief Record</button>
+                    </form>
+                </div>
+
+                <div id="reliefConfirmation" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">&#10003;</div>
+                            <h2>Relief Record Created Successfully</h2>
+                        </div>
+                        <div class="verification-result verification-success">
+                            <div class="verification-icon success-icon">&#10003;</div>
+                            <h2 style="color: var(--success); margin-bottom: 1rem;">Record Added to Blockchain</h2>
+                            <p style="margin-bottom: 1rem;">Relief proof has been generated and secured with cryptographic hash</p>
+                            <div class="relief-record-id" style="font-size: 1.5rem; margin: 1rem 0;">
+                                Relief ID: <span id="generatedReliefId"></span>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin: 2rem 0 1rem; color: var(--dark-blue);">QR Code for Beneficiary</h3>
+                        <div id="qrcode"></div>
+                        <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
+                            Share this QR code with the beneficiary or send the Relief ID via SMS
+                        </p>
+
+                        <h3 style="margin: 2rem 0 1rem; color: var(--dark-blue);">Blockchain Hash</h3>
+                        <div class="hash-display" id="displayHash"></div>
+                        
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button class="btn btn-primary" onclick="resetOfficerForm()">Add Another Record</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Officer Verify Relief Section -->
+            <div id="officer-verify" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">&#10003;</div>
+                        <h2>Verify Relief Record</h2>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Verify Relief:</strong> Enter Relief ID to verify any relief record on the blockchain
+                    </div>
+                    <form onsubmit="verifyOfficerRelief(event)">
+                        <div class="form-group">
+                            <label>Relief ID</label>
+                            <input type="text" id="officerVerifyReliefId" placeholder="Enter Relief ID (e.g., RP-WB-20260208-001)" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Verify Relief Record</button>
+                    </form>
+                </div>
+
+                <div id="officerVerificationResult"></div>
+            </div>
+
+            <!-- Officer Dashboard Section -->
+            <div id="officer-dashboard" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">&#128202;</div>
+                        <h2>Officer Dashboard - Relief Distribution Analytics</h2>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Real-Time Statistics:</strong> Anonymized, aggregated data showing relief distribution across West Bengal
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="stat-card">
+                            <h3>Total Relief Records</h3>
+                            <div class="value" id="officerTotalRecords">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Districts Covered</h3>
+                            <div class="value" id="officerDistrictsCovered">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Blockchain Integrity</h3>
+                            <div class="value" style="color: var(--success);" id="officerIntegrityStatus">Verified</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Last Updated</h3>
+                            <div class="value" style="font-size: 1.2rem;" id="officerLastUpdated">--</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 2rem 0 1rem; color: var(--dark-blue);">Distribution by Relief Type</h3>
+                    <div class="chart-container">
+                        <canvas id="officerReliefTypeChart"></canvas>
+                    </div>
+
+                    <h3 style="margin: 2rem 0 1rem; color: var(--dark-blue);">District-wise Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="officerDistrictChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Officer Audit Trail Section -->
+            <div id="officer-audit" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">&#128269;</div>
+                        <h2>Blockchain Audit Trail</h2>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Immutable Ledger:</strong> Complete chronological record of all relief distributions with cryptographic hash verification
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <button class="btn btn-primary" onclick="verifyOfficerBlockchainIntegrity()">Verify Complete Chain Integrity</button>
+                        <button class="btn btn-secondary" onclick="exportOfficerAuditLog()" style="margin-left: 1rem;">Export Audit Log</button>
+                    </div>
+
+                    <div id="officerBlockchainIntegrityResult"></div>
+
+                    <h3 style="margin: 2rem 0 1rem; color: var(--dark-blue);">Recent Relief Records</h3>
+                    <div id="officerAuditTrail"></div>
+                </div>
+            </div>
+
+            <!-- BENEFICIARY PORTAL SECTIONS -->
+            <!-- Beneficiary Login Section -->
+            <div id="beneficiary-login" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">&#128101;</div>
+                        <h2>Beneficiary Identity Verification</h2>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Secure Identity Verification:</strong> Enter your Aadhaar number for identity verification. Your Aadhaar will be verified through UIDAI API.
+                    </div>
+                    <form id="aadhaarForm" onsubmit="verifyAadhaar(event)">
+                        <div class="form-group">
+                            <label>Aadhaar Number (12 digits)</label>
+                            <input type="text" id="aadhaarNumber" placeholder="Enter 12-digit Aadhaar number" pattern="[0-9]{12}" maxlength="12" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="verifyAadhaarBtn">
+                            <span id="verifyBtnText">Verify Identity</span>
+                        </button>
+                    </form>
+                    <div id="aadhaarVerificationStatus"></div>
+                </div>
+            </div>
+
+            <!-- Beneficiary Dashboard Section -->
+            <div id="beneficiary-dashboard" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">&#128202;</div>
+                        <h2>My Personal Relief Dashboard</h2>
+                    </div>
+                    <div class="alert alert-success">
+                        <strong>Identity Verified:</strong> Beneficiary ID: <strong><span id="displayBeneficiaryId"></span></strong>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="stat-card">
+                            <h3>Total Relief Received</h3>
+                            <div class="value" id="benTotalRecords">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Relief Types</h3>
+                            <div class="value" id="benReliefTypes">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Districts Covered</h3>
+                            <div class="value" id="benDistrictsCovered">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Blockchain Status</h3>
+                            <div class="value" style="color: var(--success);" id="benIntegrityStatus">Verified</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 2rem 0 1rem; color: var(--dark-blue);">My Relief Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="benReliefTypeChart"></canvas>
+                    </div>
+
+                    <h3 style="margin: 2rem 0 1rem; color: var(--dark-blue);">My Relief Timeline</h3>
+                    <div class="timeline" id="benReliefTimeline"></div>
+                </div>
+            </div>
+
+            <!-- Beneficiary Claim Relief Section -->
+            <div id="beneficiary-claim" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">&#128221;</div>
+                        <h2>Submit Relief Claim</h2>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Anti-Duplicate Protection:</strong> Enter PIN code to auto-fill location. The system will check if you have already received this type of relief.
+                    </div>
+                    <form id="beneficiaryClaimForm" onsubmit="submitBeneficiaryClaim(event)">
+                        <div class="form-group">
+                            <label>PIN Code</label>
+                            <input type="text" id="benPinCode" placeholder="Enter 6-digit PIN code" pattern="[0-9]{6}" maxlength="6" required>
+                            <small style="color: var(--gray); display: block; margin-top: 0.5rem;">Location details will auto-fill based on PIN code</small>
+                        </div>
+                        <div id="benPinCodeStatus"></div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>District</label>
+                                <input type="text" id="benDistrict" placeholder="Auto-filled from PIN" disabled required>
+                            </div>
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" id="benState" placeholder="Auto-filled from PIN" disabled>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Post Office</label>
+                                <input type="text" id="benPostOffice" placeholder="Auto-filled from PIN" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Block/Area</label>
+                                <input type="text" id="benBlockCode" placeholder="Auto-filled from PIN" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Relief Type</label>
+                            <select id="benReliefType" required>
+                                <option value="">Select Relief Type</option>
+                                <option value="CASH">Cash Assistance</option>
+                                <option value="FOOD">Food Ration</option>
+                                <option value="MEDICAL">Medical Supplies</option>
+                                <option value="SHELTER">Shelter Material</option>
+                                <option value="CLOTHING">Clothing</option>
+                                <option value="OTHER">Other Relief</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date of Receipt</label>
+                            <input type="date" id="benReceiptDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Claim</button>
+                    </form>
+
+                    <div id="claimResult" style="margin-top: 2rem;"></div>
+                </div>
+            </div>
+
+            <!-- Beneficiary Verify Relief Section -->
+            <div id="beneficiary-verify" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">&#10003;</div>
+                        <h2>Verify My Relief Record</h2>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Verify Your Relief:</strong> Enter Relief ID to verify your relief record on the blockchain
+                    </div>
+                    <form onsubmit="verifyBeneficiaryRelief(event)">
+                        <div class="form-group">
+                            <label>Relief ID</label>
+                            <input type="text" id="benVerifyReliefId" placeholder="Enter Relief ID" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Verify Record</button>
+                    </form>
+
+                    <div id="benVerificationResult"></div>
+                </div>
+            </div>
+
+            <!-- Beneficiary Audit Trail Section -->
+            <div id="beneficiary-audit" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">&#128269;</div>
+                        <h2>My Blockchain Audit Trail</h2>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Immutable Personal Ledger:</strong> Your complete relief history secured with blockchain technology
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <button class="btn btn-primary" onclick="verifyBeneficiaryChainIntegrity()">Verify My Chain Integrity</button>
+                        <button class="btn btn-secondary" onclick="exportBeneficiaryAudit()" style="margin-left: 1rem;">Export My Audit Log</button>
+                    </div>
+
+                    <div id="benChainIntegrityResult"></div>
+
+                    <h3 style="margin: 2rem 0 1rem; color: var(--dark-blue);">Complete Relief History</h3>
+                    <div id="benAuditTrail"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#about" onclick="showAboutModal()">About the Portal</a>
+                <span class="footer-separator">|</span>
+                <a href="#copyright" onclick="showCopyrightModal()">Copyright Policy</a>
+                <span class="footer-separator">|</span>
+                <a href="#sitemap" onclick="showSitemapModal()">Site Map</a>
+                <span class="footer-separator">|</span>
+                <a href="#terms" onclick="showTermsModal()">Terms of Use</a>
+                <span class="footer-separator">|</span>
+                <a href="mailto:soumabha241001001281@technoindiaeducation.com?subject=ReliefProof WB Feedback">Feedback</a>
+                <span class="footer-separator">|</span>
+                <a href="#contact" onclick="showContactModal()">Contact Us</a>
+                <span class="footer-separator">|</span>
+                <a href="#help" onclick="showHelpModal()">Help</a>
+            </div>
+            
+            <div class="footer-copyright">
+                <p><strong>Contact:</strong> <a href="mailto:soumabha241001001281@technoindiaeducation.com" style="color: var(--light-blue);">soumabha241001001281@technoindiaeducation.com</a></p>
+                <p>&copy; 2026 ReliefProof WB. All rights reserved. | Government of West Bengal</p>
+                <p>Powered by Blockchain Technology for Transparent Disaster Relief Governance</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
