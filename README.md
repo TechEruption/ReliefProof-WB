@@ -1,4 +1,10 @@
-# ReliefProof WB - Static Web Demo
+# ReliefProof WB 
+
+🌐 Live Demo:-
+ReliefProof WB is publicly accessible via Netlify:
+
+🔗 Live URL: https://relieproofwb.netlify.app/
+
 
 This is a front-end demo of ReliefProof WB — a blockchain-inspired, client-side proof-of-relief demo. The project has been restructured so styles and scripts are split into separate files.
 
@@ -224,5 +230,6 @@ For production deployment:
 This project is a demonstration of blockchain technology for disaster relief transparency.
 
 ## Support
+
 
 For issues or questions, please create an issue in the repository.
